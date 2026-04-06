@@ -421,7 +421,7 @@ MonoBehaviour:
   cellSize: {x: 1, y: 1}
   gridOrigin: {x: 0, y: 0}
   cellPrefab: {fileID: 4781289034682240698, guid: 30d8e05694758f34a871ed943794a52f, type: 3}
-  listCellConfig:
+  listCellData:
   - {fileID: 11400000, guid: 98c5440ec53038a4daaf843f7477e0af, type: 2}
   - {fileID: 11400000, guid: 39efbf8941f850a4ba63a86aa69f8207, type: 2}
   - {fileID: 11400000, guid: b244a274dc5cc1b448b8635b613eaccf, type: 2}

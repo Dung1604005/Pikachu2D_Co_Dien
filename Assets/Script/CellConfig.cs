@@ -1,11 +1,11 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "CellConfig", menuName = "Scriptable Objects/CellConfig")]
-public class CellConfig : ScriptableObject
+[CreateAssetMenu(fileName = "CellData", menuName = "Scriptable Objects/CellData")]
+public class CellData : ScriptableObject
 {
     public int IdCell;
 
-    public Color ColorCell;
+    public Sprite CellIcon;
 
    
 }

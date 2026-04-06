@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: Cell_24
   m_EditorClassIdentifier: Assembly-CSharp::CellConfig
   IdCell: 24
-  ColorCell: {r: 0.49934155, g: 0.49196872, b: 0.2963414, a: 1}
+  CellIcon: {fileID: 8102358098348255977, guid: a532a0814224fe4479856aebc9c07055, type: 3}

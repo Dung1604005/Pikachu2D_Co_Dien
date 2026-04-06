@@ -18,56 +18,56 @@ public class GridManager : MonoBehaviour
 
     public bool[,] GridState => gridState;
 
-    [Header("List Cell Config")]
+    [Header("List Cell Data")]
 
-    [SerializeField] private List<CellConfig> listCellConfig;
+    [SerializeField] private List<CellData> listCellData;
 
-    public List<CellConfig> ListCellConfig => listCellConfig;
+    public List<CellData> ListCellData => listCellData;
 
-    private Dictionary<int, CellConfig> mapCellConfig = new Dictionary<int, CellConfig>();
+    private Dictionary<int, CellData> mapCellData = new Dictionary<int, CellData>();
 
-    public void GenerateCellConfigForGrid()
+    public void GenerateCellDataForGrid()
     {
         int totalCell = gridSize.x * gridSize.y;
 
-        int numbType = listCellConfig.Count;
+        int numbType = listCellData.Count;
 
 
         // Make every cell Type have the same cell in grid
         int cellPerType = totalCell / numbType;
 
-        List<int> listCellConfigInGrid = new List<int>();
+        List<int> listCellDataInGrid = new List<int>();
 
         for (int typeId = 1; typeId <= numbType; typeId++)
         {
             // Generate cellPerType cell every cellType
             for (int i = 0; i < cellPerType; i++)
             {
-                listCellConfigInGrid.Add(typeId);
+                listCellDataInGrid.Add(typeId);
             }
         }
         //Using algorithm Fisher-Yates Shuffle to shuffle the list
         System.Random rnd = new System.Random();
 
-        for (int j = listCellConfigInGrid.Count - 1; j >= 0; j--)
+        for (int j = listCellDataInGrid.Count - 1; j >= 0; j--)
         {
             int i = rnd.Next(0, j + 1);
 
-            int temp = listCellConfigInGrid[i];
+            int temp = listCellDataInGrid[i];
 
-            listCellConfigInGrid[i] = listCellConfigInGrid[j];
+            listCellDataInGrid[i] = listCellDataInGrid[j];
 
-            listCellConfigInGrid[j] = temp;
+            listCellDataInGrid[j] = temp;
         }
 
-        //Init CellConfig for cell in gridPoints form listCellConfigInGrid
+        //Init CellData for cell in gridPoints form list after shuffle
         int index = 0;
 
         for (int posY = 0; posY < gridSize.y; posY++)
         {
             for (int posX = 0; posX < gridSize.x; posX++)
             {
-                gridCells[posY, posX].OnInit(mapCellConfig[listCellConfigInGrid[index]]);
+                gridCells[posX, posY].OnInit(mapCellData[listCellDataInGrid[index]]);
                 index++;
             }
         }
@@ -80,11 +80,11 @@ public class GridManager : MonoBehaviour
             return new Vector2Int(-1, -1);
         }
 
-
+        // Convert world Position to grid Position
         int posX = Mathf.FloorToInt((worldPosition.x - gridOrigin.x) / cellSize.x);
         int posY = Mathf.FloorToInt((worldPosition.y - gridOrigin.y) / cellSize.y);
 
-        return new Vector2Int(posY, posX);
+        return new Vector2Int(posX, posY);
     }
 
     public bool CellIsEmpty(Vector2Int gridPosition)
@@ -95,7 +95,7 @@ public class GridManager : MonoBehaviour
             return false;
         }
         // Check if this position is empty ?
-        return gridCells[gridPosition.y, gridPosition.x].IsEmpty;
+        return gridCells[gridPosition.x, gridPosition.y].IsEmpty;
     }
 
     public bool WorldPositionIsValid(Vector2 worldPositon)
@@ -137,30 +137,30 @@ public class GridManager : MonoBehaviour
     // Start Spawn new Grid 
     public void OnInit()
     {
-        GenerateCellConfigForGrid();
+        GenerateCellDataForGrid();
     }
 
     void Awake()
     {
         // Start spawn every cell for grid
-        gridCells = new CellView[gridSize.y, gridSize.x];
+        gridCells = new CellView[gridSize.x, gridSize.y];
 
         // Grid state is a array to track the state of every cell (check if that cell is empty or not)
         // This grid include the border around the gridCells so it extend x by 2 and extend y by 2
-        gridState = new bool[gridSize.y + 2, gridSize.x + 2];
+        gridState = new bool[gridSize.x + 2, gridSize.y + 2];
         for (int posY = 0; posY < gridSize.y; posY++)
         {
             for (int posX = 0; posX < gridSize.x; posX++)
             {
-                gridCells[posY, posX] = Instantiate(cellPrefab, new Vector2(gridOrigin.x + posX * cellSize.x + cellSize.x / 2f, gridOrigin.y + posY * cellSize.y + cellSize.y / 2f), Quaternion.identity, transform).GetComponent<CellView>();
+                gridCells[posX, posY] = Instantiate(cellPrefab, new Vector2(gridOrigin.x + posX * cellSize.x + cellSize.x / 2f, gridOrigin.y + posY * cellSize.y + cellSize.y / 2f), Quaternion.identity, transform).GetComponent<CellView>();
 
             }
         }
         // Create a dictionary of cell Config for better finding cellConfig with IdCell
 
-        foreach (CellConfig cellConfig in listCellConfig)
+        foreach (CellData cellConfig in listCellData)
         {
-            mapCellConfig.Add(cellConfig.IdCell, cellConfig);
+            mapCellData.Add(cellConfig.IdCell, cellConfig);
         }
     }
 

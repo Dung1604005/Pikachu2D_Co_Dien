@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b365ef3113195e4439d8435e2b91496e, type: 3}
   m_Name: Cell_20
   m_EditorClassIdentifier: Assembly-CSharp::CellConfig
-  IdCell: 20
+  IdCellData: 20
   CellIcon: {fileID: 4164744761163438241, guid: c2d95aadbf2d5e548a4fc56fa1b30894, type: 3}

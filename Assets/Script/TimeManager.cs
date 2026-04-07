@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class TimeManager : MonoBehaviour
 {
+    [SerializeField] private TimeBar timeBar;
     private float matchTime;
     private float timeLeft;
 
@@ -17,5 +18,7 @@ public class TimeManager : MonoBehaviour
             return;
         }
         timeLeft -= Time.deltaTime;
+        timeBar.SetTimeValueSlider(timeLeft, matchTime);
+        
     }
 }

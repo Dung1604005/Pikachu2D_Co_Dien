@@ -53,7 +53,7 @@ public class GridPathfinder
     // Case 3: Start connect to End by U or Z Shape
     
 
-    public bool CheckIShape(Vector2Int startPosition, Vector2Int endPosition)
+    public bool CheckIShape(Vector2Int startPosition, Vector2Int endPosition, bool drawLine = true)
     {
         // this array store the current vertice in world grid in the path we need to go
         Vector2[] listPoint=  new Vector2[2];
@@ -65,7 +65,11 @@ public class GridPathfinder
         {
             if(CheckLineHaveSameX(startPosition.x , startPosition.y, endPosition.y))
             {
-                gridManager.PathVisual.RenderLine(2, listPoint);
+                //If have the order draw then start render line
+                if (drawLine)
+                {
+                    gridManager.PathVisual.RenderLine(2, listPoint);
+                }
                 return true;
             }
         }
@@ -74,7 +78,11 @@ public class GridPathfinder
         {
             if(CheckLineHaveSameY(startPosition.y, startPosition.x, endPosition.x))
             {
+                //If have the order draw then start render line
+                if (drawLine)
+                {
                  gridManager.PathVisual.RenderLine(2, listPoint);
+                }
                 return true;
             }
         }
@@ -82,7 +90,7 @@ public class GridPathfinder
         return false;
     }
 
-    public bool CheckLShape(Vector2Int p1, Vector2Int p2)
+    public bool CheckLShape(Vector2Int p1, Vector2Int p2, bool drawLine = true)
     {
          Vector2[] listPoint=  new Vector2[3];
         listPoint[0] = gridManager.ConvertGridPositionToWorldPosition(new Vector2Int(p1.x - 1,p1.y - 1));
@@ -102,7 +110,11 @@ public class GridPathfinder
             // => p1 can connect to p2 by L shape
 
             listPoint[1] = gridManager.ConvertGridPositionToWorldPosition(new Vector2Int(p3.x - 1,p3.y - 1));
+            //If have the order draw then start render line
+                if (drawLine)
+                {
             gridManager.PathVisual.RenderLine(3, listPoint);
+                }
             return true;
         }
 
@@ -112,7 +124,11 @@ public class GridPathfinder
         if(gridManager.GridState[p3.x, p3.y] && CheckLineHaveSameX(p2.x, p2.y, p3.y) && CheckLineHaveSameY(p1.y, p1.x, p3.x))
         {
             listPoint[1] = gridManager.ConvertGridPositionToWorldPosition(new Vector2Int(p3.x - 1,p3.y - 1));
+            //If have the order draw then start render line
+                if (drawLine)
+                {
             gridManager.PathVisual.RenderLine(3, listPoint);
+                }
             return true;
         }
 
@@ -121,7 +137,7 @@ public class GridPathfinder
 
     }
 
-    public bool CheckUShape(Vector2Int p1, Vector2Int p2)
+    public bool CheckUShape(Vector2Int p1, Vector2Int p2, bool drawLine = true)
     {
         Vector2[] listPoint=  new Vector2[4];
         listPoint[0] =  gridManager.ConvertGridPositionToWorldPosition(new Vector2Int(p1.x - 1,p1.y - 1));
@@ -147,7 +163,11 @@ public class GridPathfinder
                 
                 listPoint[1] = gridManager.ConvertGridPositionToWorldPosition(new Vector2Int(p3.x - 1,p3.y - 1), true);
                 listPoint[2] = gridManager.ConvertGridPositionToWorldPosition(new Vector2Int(p4.x - 1,p4.y - 1), true);
+                //If have the order draw then start render line
+                if (drawLine)
+                {
                 gridManager.PathVisual.RenderLine(4, listPoint);
+                }
                 Debug.Log("U Shape : " + p3 + " " + p4);
                 return true;
             }
@@ -168,7 +188,11 @@ public class GridPathfinder
                 // If find a possible p3 and p4 => can find a way with U shape
                 listPoint[1] = gridManager.ConvertGridPositionToWorldPosition(new Vector2Int(p3.x - 1,p3.y - 1), true);
                 listPoint[2] = gridManager.ConvertGridPositionToWorldPosition(new Vector2Int(p4.x - 1,p4.y - 1), true);
+                //If have the order draw then start render line
+                if (drawLine)
+                {
                 gridManager.PathVisual.RenderLine(4, listPoint);
+                }
                 Debug.Log("U Shape : " + p3 + " " + p4);
                 return true;
             }
@@ -180,24 +204,25 @@ public class GridPathfinder
 
     //Check if we can go from startPosition to EndPosition
 
-    public bool CanConnect(Vector2Int startPosition, Vector2Int endPosition)
+    public bool CanConnect(Vector2Int startPosition, Vector2Int endPosition, bool drawLine = true)
     {
+        // drawLine is the signal for program understand whether it should render line
          // Convert startPosition and endPosition from gridPoints Position to position in gridstate
         startPosition = new Vector2Int(startPosition.x + 1, startPosition.y + 1);
         endPosition = new Vector2Int(endPosition.x + 1, endPosition.y + 1);
         // Case 1: Check if we can connect by I shape
-        if(CheckIShape(startPosition, endPosition))
+        if(CheckIShape(startPosition, endPosition, drawLine))
         {
             return true;
         }
         // Case 2: Check if we can connect by L shape
-        if(CheckLShape(startPosition, endPosition))
+        if(CheckLShape(startPosition, endPosition, drawLine))
         {
             Debug.Log("DRAW L SHAPE");
             return true;
         }
         // Case 3: Check if we can connect by U shape
-        if(CheckUShape(startPosition, endPosition))
+        if(CheckUShape(startPosition, endPosition, drawLine))
         {
             Debug.Log("DRAW U SHAPE");
             return true;

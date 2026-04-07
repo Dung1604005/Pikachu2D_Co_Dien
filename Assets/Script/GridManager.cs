@@ -33,8 +33,10 @@ public class GridManager : MonoBehaviour
 
     private Vector2Int currentChoosedCellPosition;
     
+    // The dictionary help finding cellData by IdCellData
     private Dictionary<int, CellData> mapCellData = new Dictionary<int, CellData>();
 
+    // This dictionary store activeCell group by IdCellData
     private Dictionary<int, List<Vector2Int>> activeCellsDictionary = new Dictionary<int, List<Vector2Int>>();
 
     #endregion
@@ -150,12 +152,39 @@ public class GridManager : MonoBehaviour
     #endregion
 
     #region INIT/Shuffle 
+    // Start Spawn new Grid 
+    public void OnInit()
+    {
+        // Implement that no cell is choosed right now
+        currentChoosedCellPosition = new Vector2Int(-1, -1);
+        GenerateCellDataForGrid();
+    }
 
     /// <summary>
     /// Using Fisher-Yates Shuffle to shuffle the list of cell data then push them into grid
     /// </summary>
     public void GenerateCellDataForGrid()
     {
+        // Clear old active cell
+        activeCellsDictionary.Clear();
+
+        // First init all the grid is empty
+        for(int posX = 0 ; posX < gridSize.x + 2; posX++)
+        {
+            for(int posY =0; posY < gridSize.y + 2; posY++)
+            {
+                gridState[posX, posY] = true;
+            }
+        }
+        // Then init all the cell in the real gridCell is false because they all exist
+        for(int posX = 1 ; posX < gridSize.x + 1; posX++)
+        {
+            for(int posY =1; posY < gridSize.y + 1; posY++)
+            {
+                gridState[posX, posY] = false;
+            }      
+        }
+
         int totalCell = gridSize.x * gridSize.y;
 
         int numbType = listCellData.Count;
@@ -174,6 +203,7 @@ public class GridManager : MonoBehaviour
                 listCellDataInGrid.Add(typeId);
             }
         }
+        
         ShuffleGrid(listCellDataInGrid);
        
 
@@ -208,8 +238,10 @@ public class GridManager : MonoBehaviour
                 {   
                     continue;
                 }
+
                 CellData cellData = mapCellData[listCellDataInGrid[index]];
                 gridCells[posX, posY].OnInit(cellData, new Vector2Int(posX, posY));
+                gridCells[posX, posY].SetUnChoosed();
                 index++;
 
                 //Update Cell active in dictionary
@@ -224,6 +256,8 @@ public class GridManager : MonoBehaviour
 
     public void UpdateCurrentCellChoosed(Vector2Int position)
     {
+        // Cell 1 is the new cell is choosed
+        // Cell 2 is the choosed cell before this
         CellView cell1 = GetCellByGridPosition(position);
         CellView cell2 = GetCellByGridPosition(currentChoosedCellPosition);
         //Avoid duplicate
@@ -297,8 +331,11 @@ public class GridManager : MonoBehaviour
                 gridState[position.x + 1, position.y + 1] = true;
                 gridState[currentChoosedCellPosition.x + 1, currentChoosedCellPosition.y + 1] = true;
 
-                
+                //The grid is change 
+                OnChangeGrid();
 
+                //Update Point for game
+                GameManager.Instance.AddPoint(20);
                 Debug.Log("Connect success");
 
             }
@@ -350,6 +387,9 @@ public class GridManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// This function is called when the grid is change
+    /// </summary>
     public void OnChangeGrid()
     {
         // the grid is deadlock
@@ -381,29 +421,20 @@ public class GridManager : MonoBehaviour
             {
                 for(int j = i + 1; j < idGroup.Count; j++)
                 {
-                    // Find move => grid is not in deadlock state
-                    if(gridPathfinder.CanConnect(idGroup[i], idGroup[j]))
+                    // Find a move => grid is not in deadlock state
+                    // We just want to check, so set order draw = false
+                    if(gridPathfinder.CanConnect(idGroup[i], idGroup[j], false))
                     {
                         return true;
                     }
                 }
             }
-
-
         }
         // There is no move 
         return false;
     }
 
     #endregion
-
-    // Start Spawn new Grid 
-    public void OnInit()
-    {
-        // Implement that no cell is choosed right now
-        currentChoosedCellPosition = new Vector2Int(-1, -1);
-        GenerateCellDataForGrid();
-    }
 
     void Awake()
     {
@@ -414,22 +445,7 @@ public class GridManager : MonoBehaviour
         // Grid state is a array to track the state of every cell (check if that cell is empty or not)
         // This grid include the border around the gridCells so it extend x by 2 and extend y by 2
         gridState = new bool[gridSize.x + 2, gridSize.y + 2];
-        // First init all the grid is empty
-        for(int posX = 0 ; posX < gridSize.x + 2; posX++)
-        {
-            for(int posY =0; posY < gridSize.y + 2; posY++)
-            {
-                gridState[posX, posY] = true;
-            }
-        }
-        // Then init all the cell in the real gridCell is false because they all exist
-        for(int posX = 1 ; posX < gridSize.x + 1; posX++)
-        {
-            for(int posY =1; posY < gridSize.y + 1; posY++)
-            {
-                gridState[posX, posY] = false;
-            }      
-        }
+        
          // Start spawn every cell for grid
         for (int posY = 0; posY < gridSize.y; posY++)
         {

@@ -7,11 +7,6 @@ public class GridPathfinder
 {
     private GridManager gridManager;
 
-
-    int[] offsetX = {-1, 1, 0 ,0};
-    int[] offsetY = {0, 0 , 1, - 1};
-
-
     public void OnInit(GridManager _gridManager)
     {
         gridManager = _gridManager;
@@ -60,11 +55,17 @@ public class GridPathfinder
 
     public bool CheckIShape(Vector2Int startPosition, Vector2Int endPosition)
     {
+        // this array store the current vertice in world grid in the path we need to go
+        Vector2[] listPoint=  new Vector2[2];
+        listPoint[0] = gridManager.ConvertGridPositionToWorldPosition(new Vector2Int(startPosition.x - 1,startPosition.y - 1));
+        listPoint[1] = gridManager.ConvertGridPositionToWorldPosition(new Vector2Int(endPosition.x - 1,endPosition.y - 1));
+
         // If 2 position have the same X then check if they can connect 
         if(startPosition.x == endPosition.x)
         {
             if(CheckLineHaveSameX(startPosition.x , startPosition.y, endPosition.y))
             {
+                gridManager.PathVisual.RenderLine(2, listPoint);
                 return true;
             }
         }
@@ -73,6 +74,7 @@ public class GridPathfinder
         {
             if(CheckLineHaveSameY(startPosition.y, startPosition.x, endPosition.x))
             {
+                 gridManager.PathVisual.RenderLine(2, listPoint);
                 return true;
             }
         }
@@ -82,6 +84,10 @@ public class GridPathfinder
 
     public bool CheckLShape(Vector2Int p1, Vector2Int p2)
     {
+         Vector2[] listPoint=  new Vector2[3];
+        listPoint[0] = gridManager.ConvertGridPositionToWorldPosition(new Vector2Int(p1.x - 1,p1.y - 1));
+        listPoint[2] = gridManager.ConvertGridPositionToWorldPosition(new Vector2Int(p2.x - 1,p2.y - 1));
+
         //We want to check L shape connect from p1 to p2
         // => there must be the intersect of p1.x and p2.y
         // Or the intersect of p1.y and p2.x
@@ -94,6 +100,9 @@ public class GridPathfinder
         {
             // If p1 can connect to p3 and p3 can connect to p2
             // => p1 can connect to p2 by L shape
+
+            listPoint[1] = gridManager.ConvertGridPositionToWorldPosition(new Vector2Int(p3.x - 1,p3.y - 1));
+            gridManager.PathVisual.RenderLine(3, listPoint);
             return true;
         }
 
@@ -102,6 +111,8 @@ public class GridPathfinder
 
         if(gridManager.GridState[p3.x, p3.y] && CheckLineHaveSameX(p2.x, p2.y, p3.y) && CheckLineHaveSameY(p1.y, p1.x, p3.x))
         {
+            listPoint[1] = gridManager.ConvertGridPositionToWorldPosition(new Vector2Int(p3.x - 1,p3.y - 1));
+            gridManager.PathVisual.RenderLine(3, listPoint);
             return true;
         }
 
@@ -112,6 +123,9 @@ public class GridPathfinder
 
     public bool CheckUShape(Vector2Int p1, Vector2Int p2)
     {
+        Vector2[] listPoint=  new Vector2[4];
+        listPoint[0] =  gridManager.ConvertGridPositionToWorldPosition(new Vector2Int(p1.x - 1,p1.y - 1));
+        listPoint[3] = gridManager.ConvertGridPositionToWorldPosition(new Vector2Int(p2.x - 1,p2.y - 1));
         // We want to check U or Z Shape connect from p1 to p2
         // => We must find 2 point (we call this as p3 and p4) which satisfied  the condition below:
         // 1. (p3.x = p1.x and p4.x = p2.x and p3.y = p4.y) or (p3.y = p1.y and p4.y = p2.y and p3.x = p4.x)
@@ -129,6 +143,12 @@ public class GridPathfinder
             && CheckLineHaveSameY(y, p3.x, p4.x))
             {
                 // If find a possible p3 and p4 => can find a way with U shape
+
+                
+                listPoint[1] = gridManager.ConvertGridPositionToWorldPosition(new Vector2Int(p3.x - 1,p3.y - 1), true);
+                listPoint[2] = gridManager.ConvertGridPositionToWorldPosition(new Vector2Int(p4.x - 1,p4.y - 1), true);
+                gridManager.PathVisual.RenderLine(4, listPoint);
+                Debug.Log("U Shape : " + p3 + " " + p4);
                 return true;
             }
         }
@@ -146,6 +166,10 @@ public class GridPathfinder
             && CheckLineHaveSameX(x, p3.y, p4.y))
             {
                 // If find a possible p3 and p4 => can find a way with U shape
+                listPoint[1] = gridManager.ConvertGridPositionToWorldPosition(new Vector2Int(p3.x - 1,p3.y - 1), true);
+                listPoint[2] = gridManager.ConvertGridPositionToWorldPosition(new Vector2Int(p4.x - 1,p4.y - 1), true);
+                gridManager.PathVisual.RenderLine(4, listPoint);
+                Debug.Log("U Shape : " + p3 + " " + p4);
                 return true;
             }
         }
@@ -158,7 +182,28 @@ public class GridPathfinder
 
     public bool CanConnect(Vector2Int startPosition, Vector2Int endPosition)
     {
-        return true;
+         // Convert startPosition and endPosition from gridPoints Position to position in gridstate
+        startPosition = new Vector2Int(startPosition.x + 1, startPosition.y + 1);
+        endPosition = new Vector2Int(endPosition.x + 1, endPosition.y + 1);
+        // Case 1: Check if we can connect by I shape
+        if(CheckIShape(startPosition, endPosition))
+        {
+            return true;
+        }
+        // Case 2: Check if we can connect by L shape
+        if(CheckLShape(startPosition, endPosition))
+        {
+            Debug.Log("DRAW L SHAPE");
+            return true;
+        }
+        // Case 3: Check if we can connect by U shape
+        if(CheckUShape(startPosition, endPosition))
+        {
+            Debug.Log("DRAW U SHAPE");
+            return true;
+        }
+        // If 3 case above can't satisfied => we can't connect startPosition to endPosition
+        return false;
         
     }
 }

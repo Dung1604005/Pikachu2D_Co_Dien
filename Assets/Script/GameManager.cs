@@ -1,8 +1,7 @@
 using UnityEngine;
 
-public class GameManager : MonoBehaviour
+public class GameManager : Singleton<GameManager>
 {
-    public static GameManager Instance;
     [Header("Reference")]
     [SerializeField] private GridManager gridManager;
 
@@ -26,18 +25,7 @@ public class GameManager : MonoBehaviour
     public int CurrentPoint => currentPoint;
     #endregion
 
-    void Awake()
-    {
-        // Set up singleton
-        if(Instance != null)
-        {
-            Destroy(this.gameObject);
-            return;
-        }
-        Instance = this;
-        DontDestroyOnLoad(this.gameObject);
-        
-    }
+    
     /// <summary>
     /// Restart the game
     /// </summary>

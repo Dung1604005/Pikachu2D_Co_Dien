@@ -15,7 +15,7 @@ public class TimeBar : MonoBehaviour
     public void SetTimeValueSlider(float currentTimeValue, float matchTime)
     {
         
-        timeSlider.value = currentTimeValue/matchTime;
+        timeSlider.value = Mathf.Lerp(timeSlider.value, currentTimeValue/matchTime, 0.1f);
 
     }
 

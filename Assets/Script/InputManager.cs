@@ -40,8 +40,9 @@ public class InputManager : MonoBehaviour
         Vector2 screenPosition = Mouse.current.position.ReadValue();
 
         Vector2 worldPosition = Camera.main.ScreenToWorldPoint(screenPosition);
-        // Raycast from mouse position to check if any cell in there
+        // Convert world position to grid position to get cell pos
 
-        gridManager.GetCellByGridPosition(gridManager.ConvertWorldPositionToGridPosition(worldPosition))?.SetChoosed();
+        gridManager.GetCellByGridPosition
+        (CordinateConventor.ConvertWorldPositionToGridPosition(worldPosition, gridManager.GridOrigin, gridManager.GridSize, gridManager.CellSize))?.SetChoosed();
     }
 }

@@ -11,6 +11,11 @@ public class TimeManager : MonoBehaviour
         matchTime = _matchTime;
         timeLeft= matchTime;
     }
+    public void AddTime(float _amount)
+    {
+        // Add time and dont let it over the matchTime
+        timeLeft = Mathf.Min(matchTime, timeLeft + _amount);
+    }
     void Update()
     {
         if (timeLeft <= 0.1f)

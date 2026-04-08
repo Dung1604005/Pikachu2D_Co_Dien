@@ -5,11 +5,22 @@ using UnityEngine;
 
 public class GridPathfinder 
 {
+    #region Grid Config
+    private Vector2Int gridSize;
+
+    private Vector2 cellSize;
+
+    private Vector2 gridOrigin;
+
+    #endregion
     private GridManager gridManager;
 
     public void OnInit(GridManager _gridManager)
     {
         gridManager = _gridManager;
+        gridSize = gridManager.GridSize;
+        gridOrigin = gridManager.GridOrigin;
+        cellSize = gridManager.CellSize;
     }
 
     // Check if point at (x1, y) can go to (x2, y)
@@ -57,8 +68,10 @@ public class GridPathfinder
     {
         // this array store the current vertice in world grid in the path we need to go
         Vector2[] listPoint=  new Vector2[2];
-        listPoint[0] = gridManager.ConvertGridPositionToWorldPosition(new Vector2Int(startPosition.x - 1,startPosition.y - 1));
-        listPoint[1] = gridManager.ConvertGridPositionToWorldPosition(new Vector2Int(endPosition.x - 1,endPosition.y - 1));
+        listPoint[0] = CordinateConventor.ConvertGridPositionToWorldPosition
+        (new Vector2Int(startPosition.x - 1,startPosition.y - 1), gridOrigin,gridSize, cellSize);
+        listPoint[1] = CordinateConventor.ConvertGridPositionToWorldPosition
+        (new Vector2Int(endPosition.x - 1,endPosition.y - 1), gridOrigin,gridSize, cellSize);
 
         // If 2 position have the same X then check if they can connect 
         if(startPosition.x == endPosition.x)
@@ -93,8 +106,8 @@ public class GridPathfinder
     public bool CheckLShape(Vector2Int p1, Vector2Int p2, bool drawLine = true)
     {
          Vector2[] listPoint=  new Vector2[3];
-        listPoint[0] = gridManager.ConvertGridPositionToWorldPosition(new Vector2Int(p1.x - 1,p1.y - 1));
-        listPoint[2] = gridManager.ConvertGridPositionToWorldPosition(new Vector2Int(p2.x - 1,p2.y - 1));
+        listPoint[0] = CordinateConventor.ConvertGridPositionToWorldPosition(new Vector2Int(p1.x - 1,p1.y - 1), gridOrigin,gridSize, cellSize);
+        listPoint[2] = CordinateConventor.ConvertGridPositionToWorldPosition(new Vector2Int(p2.x - 1,p2.y - 1), gridOrigin,gridSize, cellSize);
 
         //We want to check L shape connect from p1 to p2
         // => there must be the intersect of p1.x and p2.y
@@ -109,7 +122,7 @@ public class GridPathfinder
             // If p1 can connect to p3 and p3 can connect to p2
             // => p1 can connect to p2 by L shape
 
-            listPoint[1] = gridManager.ConvertGridPositionToWorldPosition(new Vector2Int(p3.x - 1,p3.y - 1));
+            listPoint[1] = CordinateConventor.ConvertGridPositionToWorldPosition(new Vector2Int(p3.x - 1,p3.y - 1), gridOrigin,gridSize, cellSize, true);
             //If have the order draw then start render line
                 if (drawLine)
                 {
@@ -123,7 +136,7 @@ public class GridPathfinder
 
         if(gridManager.GridState[p3.x, p3.y] && CheckLineHaveSameX(p2.x, p2.y, p3.y) && CheckLineHaveSameY(p1.y, p1.x, p3.x))
         {
-            listPoint[1] = gridManager.ConvertGridPositionToWorldPosition(new Vector2Int(p3.x - 1,p3.y - 1));
+            listPoint[1] = CordinateConventor.ConvertGridPositionToWorldPosition(new Vector2Int(p3.x - 1,p3.y - 1), gridOrigin,gridSize, cellSize);
             //If have the order draw then start render line
                 if (drawLine)
                 {
@@ -140,8 +153,8 @@ public class GridPathfinder
     public bool CheckUShape(Vector2Int p1, Vector2Int p2, bool drawLine = true)
     {
         Vector2[] listPoint=  new Vector2[4];
-        listPoint[0] =  gridManager.ConvertGridPositionToWorldPosition(new Vector2Int(p1.x - 1,p1.y - 1));
-        listPoint[3] = gridManager.ConvertGridPositionToWorldPosition(new Vector2Int(p2.x - 1,p2.y - 1));
+        listPoint[0] =  CordinateConventor.ConvertGridPositionToWorldPosition(new Vector2Int(p1.x - 1,p1.y - 1), gridOrigin,gridSize, cellSize);
+        listPoint[3] = CordinateConventor.ConvertGridPositionToWorldPosition(new Vector2Int(p2.x - 1,p2.y - 1), gridOrigin,gridSize, cellSize);
         // We want to check U or Z Shape connect from p1 to p2
         // => We must find 2 point (we call this as p3 and p4) which satisfied  the condition below:
         // 1. (p3.x = p1.x and p4.x = p2.x and p3.y = p4.y) or (p3.y = p1.y and p4.y = p2.y and p3.x = p4.x)
@@ -161,8 +174,8 @@ public class GridPathfinder
                 // If find a possible p3 and p4 => can find a way with U shape
 
                 
-                listPoint[1] = gridManager.ConvertGridPositionToWorldPosition(new Vector2Int(p3.x - 1,p3.y - 1), true);
-                listPoint[2] = gridManager.ConvertGridPositionToWorldPosition(new Vector2Int(p4.x - 1,p4.y - 1), true);
+                listPoint[1] = CordinateConventor.ConvertGridPositionToWorldPosition(new Vector2Int(p3.x - 1,p3.y - 1), gridOrigin,gridSize, cellSize, true);
+                listPoint[2] = CordinateConventor.ConvertGridPositionToWorldPosition(new Vector2Int(p4.x - 1,p4.y - 1), gridOrigin,gridSize, cellSize, true);
                 //If have the order draw then start render line
                 if (drawLine)
                 {
@@ -186,8 +199,8 @@ public class GridPathfinder
             && CheckLineHaveSameX(x, p3.y, p4.y))
             {
                 // If find a possible p3 and p4 => can find a way with U shape
-                listPoint[1] = gridManager.ConvertGridPositionToWorldPosition(new Vector2Int(p3.x - 1,p3.y - 1), true);
-                listPoint[2] = gridManager.ConvertGridPositionToWorldPosition(new Vector2Int(p4.x - 1,p4.y - 1), true);
+                listPoint[1] = CordinateConventor.ConvertGridPositionToWorldPosition(new Vector2Int(p3.x - 1,p3.y - 1), gridOrigin,gridSize, cellSize, true);
+                listPoint[2] = CordinateConventor.ConvertGridPositionToWorldPosition(new Vector2Int(p4.x - 1,p4.y - 1), gridOrigin,gridSize, cellSize, true);
                 //If have the order draw then start render line
                 if (drawLine)
                 {

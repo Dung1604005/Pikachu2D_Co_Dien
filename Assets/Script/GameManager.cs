@@ -23,6 +23,8 @@ public class GameManager : Singleton<GameManager>
     public int TimeShuffle => timeShuffle;
 
     public int CurrentPoint => currentPoint;
+
+    public TimeManager TimeManager => timeManager;
     #endregion
 
     
@@ -31,8 +33,8 @@ public class GameManager : Singleton<GameManager>
     /// </summary>
     public void OnInit()
     {
-        // Set time for match is 300s
-        timeManager.OnInit(300);
+        // Set time for match is 120
+        timeManager.OnInit(120);
         gridManager.OnInit();
         // Start with 5 time shuffle and 0 point
         timeShuffle  = 5;

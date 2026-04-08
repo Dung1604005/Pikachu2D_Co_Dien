@@ -49,42 +49,21 @@ public class GridManager : MonoBehaviour
 
     public List<CellData> ListCellData => listCellData;
 
+    public Vector2Int GridSize => gridSize;
+
+    public Vector2 CellSize => cellSize;
+
+    public Vector2 GridOrigin => gridOrigin;
+
     #endregion
 
     #region HELPER METHOD
 
-    public Vector2Int ConvertWorldPositionToGridPosition(Vector2 worldPosition)
-    {
-        if (!WorldPositionIsValid(worldPosition))
-        {
-            return new Vector2Int(-1, -1);
-        }
-
-        // Convert world Position to grid Position
-        int posX = Mathf.FloorToInt((worldPosition.x - gridOrigin.x) / cellSize.x);
-        int posY = Mathf.FloorToInt((worldPosition.y - gridOrigin.y) / cellSize.y);
-
-
-        return new Vector2Int(posX, posY);
-    }
-
-    public Vector2 ConvertGridPositionToWorldPosition(Vector2Int gridPosition , bool force = false)
-    {
-        if (!GridPositionIsValid(gridPosition) && !force)
-        {
-            return new Vector2(-1, -1);
-        }
-
-        Vector2 worldPosition =  new Vector2(gridOrigin.x + gridPosition.x * cellSize.x + cellSize.x / 2f, gridOrigin.y + gridPosition.y * cellSize.y + cellSize.y / 2f);
-
-        Debug.Log(gridPosition + " " + worldPosition);
-        return worldPosition;
-    }
-
+    
     public bool CellIsEmpty(Vector2Int gridPosition)
     {
         //Check if this grid Position is valid
-        if (!GridPositionIsValid(gridPosition))
+        if (!CordinateConventor.GridPositionIsValid(gridPosition, gridSize))
         {
             return false;
         }
@@ -92,35 +71,10 @@ public class GridManager : MonoBehaviour
         return gridState[gridPosition.x + 1, gridPosition.y + 1];
     }
 
-    public bool WorldPositionIsValid(Vector2 worldPositon)
-    {
-        Debug.Log(worldPositon);
-        Vector2 mostLeftBottomPosition = gridOrigin;
-        Vector2 mostRightUpPosition = gridOrigin + new Vector2(gridSize.x * cellSize.x, gridSize.y * cellSize.y);
-        if (worldPositon.x < mostLeftBottomPosition.x || worldPositon.y < mostLeftBottomPosition.y || worldPositon.x > mostRightUpPosition.x || worldPositon.y > mostRightUpPosition.y)
-        {
-            
-            return false;
-        }
-        
-        return true;
-    }
-
-    public bool GridPositionIsValid(Vector2Int gridPosition)
-    {
-        // Check if grid position is not outside the array
-        if (gridPosition.x < 0 || gridPosition.x >= gridSize.x || gridPosition.y < 0 || gridPosition.y >= gridSize.y)
-        {
-            return false;
-        }
-        return true;
-    }
-
-
     public CellView GetCellByGridPosition(Vector2Int gridPosition)
     {
         // Check if this position is valid and empty ?
-        if (!GridPositionIsValid(gridPosition))
+        if (!CordinateConventor.GridPositionIsValid(gridPosition, gridSize))
         {
             return null;
         }
@@ -266,7 +220,7 @@ public class GridManager : MonoBehaviour
         {
             return;
         }
-        if (!GridPositionIsValid(position))
+        if (!CordinateConventor.GridPositionIsValid(position, gridSize))
         {
             cell1?.SetUnChoosed();
             //If previous choosed cell is not empty then make it unchoosed
@@ -333,9 +287,11 @@ public class GridManager : MonoBehaviour
 
                 //The grid is change 
                 OnChangeGrid();
+                
 
                 //Update Point for game
                 GameManager.Instance.AddPoint(20);
+                GameManager.Instance.TimeManager.AddTime(5);
                 Debug.Log("Connect success");
 
             }
